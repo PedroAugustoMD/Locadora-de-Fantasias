@@ -1,5 +1,8 @@
 import pickle
 import random
+import os
+from datetime import date
+from datetime import datetime
 
 clientes = {}
 try:
@@ -18,6 +21,20 @@ try:
 except IOError:
   print("Erro ao abrir o arquivo")
   print("Base de dados está vazia!")
+
+alugueis = {}
+try:
+  arqAlugueis = open("alugueis.dat", "rb")
+  alugueis = pickle.load(arqAlugueis)
+  arqAlugueis.close()
+except IOError:
+  print("Erro ao abrir o arquivo")
+  print("Base de dados está vazia!")
+
+def diferencaDias(d1,d2):
+    d1 = datetime.strptime(d1, "%d/%m/%Y")
+    d2 = datetime.strptime(d2, '%d/%m/%Y')
+    return abs((d2 - d1).days)
 
 def validaCPF(cpf):
   tam = len(cpf)
@@ -49,9 +66,10 @@ def validaCPF(cpf):
 
 resp = 15
 while resp != 0:
+  
   print()
   print(" = = = = = = = = = = = = = = = == = = = = = = = = = = = = = = =")
-  print(" = = = PyFantasie - Alugue suas fantasias por uma semana  = = =")
+  print(" = = = = = = = =  Alugue suas fantasias por uma semana  = = = =")
   print(" = = = = = = = = = = = = = = = == = = = = = = = = = = = = = = =")
   print("1. Cadastro")
   print("2. Consultar")
@@ -63,7 +81,9 @@ while resp != 0:
   print("0. Encerrar programa")
   resp = int(input("Escolha sua opção: "))
 
+
   if resp == 1:
+    os.system('clear')
     escolha = int(input("Digite 1 para cadastrar uma fantasia ou 2 para cadastrar um cliente: "))
     if escolha == 1:
       id = input("Qual o id da fantasia a cadastrar? ")
@@ -91,7 +111,9 @@ while resp != 0:
     else:
       print("Escolha Inválida!")
 
+
   elif resp == 2:
+    os.system('clear')
     escolha = int(input("Digite 1 para consultar uma fantasia ou 2 para consultar um cliente: "))
     if escolha == 1:
       id = input("Qual o id da fantasia a consultar? ")
@@ -122,7 +144,9 @@ while resp != 0:
     else:
       print("Escolha Inválida!")
   
+
   elif resp == 3:
+    os.system('clear')
     escolha = int(input("Digite 1 para alterar uma fantasia ou 2 para alterar um cliente: "))
     if escolha == 1:
       id = input("Qual o id da fantasia a alterar? ")
@@ -173,7 +197,10 @@ while resp != 0:
         print('Cliente %s não está cadastrado!'%cpf)
     else:
       print("Escolha Inválida!")
+
+
   elif resp == 4:
+    os.system('clear')
     escolha = int(input("Digite 1 para excluir uma fantasia ou 2 para excluir um cliente: "))
     if escolha == 1:
       id = input("Qual o id da fantasia que você deseja excluir? ")
@@ -218,6 +245,80 @@ while resp != 0:
     else:
       print("Escolha Inválida!")
 
+  elif resp == 5:
+    os.system('clear')
+    cpf = input("Digite seu cpf: ")
+    if cpf in clientes:
+      resposta = "s"
+      while resposta == "s":
+        id = input("Qual o ID da fantasia a alugar? ")
+        if id in fantasias:
+          if fantasias[id][2]:
+            print()
+            print('Status: Fantasia disponível')
+            print('ID  :', id)
+            print('Nome  :', fantasias[id][0])
+            print('Aluguel : R$ %.2f'%fantasias[id][1])
+            print('Alugada %d vezes'%fantasias[id][3])
+            confirma = input('Confirma aluguel (s/n)? ')
+            if confirma.lower() == 's':
+              #dataAlu = input("Digite a data do aluguel: ")
+              dataAlu = datetime.now().strftime('%d/%m/%Y')
+              fantasias[id][2] = False
+              fantasias[id][3] += 1
+              clientes[cpf][3] += fantasias[id][1]
+              clientes[cpf][4] += 1
+              idaluguel = random.randint(0,1000)
+              preco = fantasias[id][1]
+              while idaluguel not in alugueis:
+                alugueis[idaluguel] = [dataAlu, id, cpf, False, preco]
+              print("Fantasia alugada, o prazo para entrega é uma semana. A multa é de R$2,00 a cada dia de atraso")
+            else:
+              print('Ok, temos outros modelos disponíveis')
+          else:
+            print('Status: Fantasia não disponível')
+        else:
+          print('Fantasia %s não está cadastrada!'%id)
+        resposta = input("Quer alugar outra fantasia? Se sim digite 's': ")
+    else:
+      print("CPF não cadastrado!")
+
+  
+  elif resp == 6:
+    os.system('clear')
+    cpf = input("Digite seu cpf: ")
+    if cpf in clientes:
+      print("Esses são os seus empréstimos")
+      for idaluguel in alugueis:
+        if (alugueis[idaluguel][2] == cpf and alugueis[idaluguel][3] == False):
+          print('ID da fantasia :', alugueis[idaluguel][1])
+          print('Data  :', alugueis[idaluguel][0])
+          print('Preço : R$ %.2f'%alugueis[idaluguel][4])
+          
+      idFant = input("Digite o id da fantasia que deseja devolver: ")
+      for idaluguel in alugueis:
+        if idFant in fantasias:
+          if (alugueis[idaluguel][1] == idFant and alugueis[idaluguel][2] == cpf):
+            d2 = datetime.now().strftime('%d/%m/%Y')
+            dias = diferencaDias(alugueis[idaluguel][0],d2)
+            if dias > 7:
+              multa = (dias - 7) * 2
+              print('Multa : R$ %.2f'%multa)
+              clientes[cpf][3] += multa
+              alugueis[idaluguel][4] += multa
+
+            else:
+              print("A data de entrega está dentro do prazo, não será necessário cobrar multa!")
+            fantasias[idFant][2] = True
+            alugueis[idaluguel][3] = True
+            clientes[cpf][3] = 0.0
+            print("Fantasia entregue!")
+        else:
+          print("ID inválido!")
+          
+    else:
+      print("CPF não cadastrado!")
+
 arqFantasias = open("fantasias.dat", "wb")
 pickle.dump(fantasias, arqFantasias)
 arqFantasias.close()
@@ -226,4 +327,9 @@ arqClientes = open("clientes.dat", "wb")
 pickle.dump(clientes, arqClientes)
 arqClientes.close()
 
+arqAlugueis = open("alugueis.dat", "wb")
+pickle.dump(alugueis, arqAlugueis)
+arqAlugueis.close()
+
+print("Fim do Programa!")
   
