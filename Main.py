@@ -72,7 +72,7 @@ while resp != 0:
   print(" = = = = = = = =  Alugue suas fantasias por uma semana  = = = =")
   print(" = = = = = = = = = = = = = = = == = = = = = = = = = = = = = = =")
   print(" = = = = = = = = = = = = = = = == = = = = = = = = = = = = = = =")
-  print("1. Cadastro")
+  print("1. Cadastrar")
   print("2. Consultar")
   print("3. Alterar")
   print("4. Excluir")
