@@ -71,6 +71,7 @@ while resp != 0:
   print(" = = = = = = = = = = = = = = = == = = = = = = = = = = = = = = =")
   print(" = = = = = = = =  Alugue suas fantasias por uma semana  = = = =")
   print(" = = = = = = = = = = = = = = = == = = = = = = = = = = = = = = =")
+  print(" = = = = = = = = = = = = = = = == = = = = = = = = = = = = = = =")
   print("1. Cadastro")
   print("2. Consultar")
   print("3. Alterar")
