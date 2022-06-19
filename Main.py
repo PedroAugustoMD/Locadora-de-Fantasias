@@ -61,7 +61,6 @@ def validaCPF(cpf):
     d2 = 0
   if d2 != int(cpf[10]):
     return False
-
   return True
 
 resp = 15
