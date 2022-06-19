@@ -59,8 +59,9 @@ def validaCPF(cpf):
   d2 = 11 - (soma%11)
   if (d2 == 10 or d2 == 11):
     d2 = 0
-  if d2 != int(cpf[10]):
+  if d2 != int(cpf[10]):    
     return False
+    
   return True
 
 resp = 15
